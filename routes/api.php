@@ -4,27 +4,13 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WeatherController;
 use App\Http\Controllers\RekomendasiController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes — Atamagri
-|--------------------------------------------------------------------------
-| Prefix otomatis: /api/...
-| Contoh: POST /api/cuaca, POST /api/rekomendasi
-|--------------------------------------------------------------------------
-*/
-
-// ═══════════════════════════════════════
-// PUBLIC API (tanpa auth)
-// ═══════════════════════════════════════
 
 Route::prefix('v1')->group(function () {
 
-    // --- Cuaca ---
-    // POST /api/v1/cuaca
-    // Body: { "city": "Surakarta" }
+  
     Route::post('/cuaca', [WeatherController::class, 'fetch'])->name('api.v1.cuaca');
 
-    // GET /api/v1/cuaca?city=Surakarta
+ 
     Route::get('/cuaca', function (\Illuminate\Http\Request $request) {
         $request->validate(['city' => 'required|string|max:100']);
         $wc = app(WeatherController::class);
@@ -35,13 +21,10 @@ Route::prefix('v1')->group(function () {
         return response()->json(['success' => true, 'data' => $data]);
     })->name('api.v1.cuaca.get');
 
-    // --- Rekomendasi ---
-    // POST /api/v1/rekomendasi
-    // Body: { "city": "Surakarta" }
+
     Route::post('/rekomendasi', [RekomendasiController::class, 'fetch'])->name('api.v1.rekomendasi');
 
-    // --- Health check ---
-    // GET /api/v1/ping
+
     Route::get('/ping', function () {
         return response()->json([
             'success' => true,
@@ -58,9 +41,7 @@ Route::prefix('v1')->group(function () {
 
 });
 
-// ═══════════════════════════════════════
-// PROTECTED API (butuh login / Sanctum)
-// ═══════════════════════════════════════
+
 
 Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
 
@@ -78,10 +59,9 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
         ]);
     })->name('api.v1.user');
 
-    // POST /api/v1/dashboard/cuaca
+   
     Route::post('/dashboard/cuaca', [WeatherController::class, 'fetchDash'])->name('api.v1.dashboard.cuaca');
 
-    // POST /api/v1/dashboard/rekomendasi
     Route::post('/dashboard/rekomendasi', [RekomendasiController::class, 'fetchDash'])->name('api.v1.dashboard.rekomendasi');
 
 });
