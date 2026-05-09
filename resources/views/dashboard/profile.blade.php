@@ -41,7 +41,7 @@
   @endif
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
-    <!-- Info card -->
+ 
     <div class="card">
       <div class="card-header"><h3>Informasi Pribadi</h3></div>
       <div class="card-body">
@@ -62,7 +62,6 @@
       </div>
     </div>
 
-    <!-- Edit form -->
     <div class="card">
       <div class="card-header"><h3>Edit Profil</h3></div>
       <div class="card-body">
