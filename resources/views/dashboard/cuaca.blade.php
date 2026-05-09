@@ -115,7 +115,6 @@ async function fetchDashWeather() {
   } catch(e) { document.getElementById('dash-weather-loading').style.display = 'none'; showToast('Gagal terhubung', '⚠️'); }
 }
 
-// Auto-load jika ada lokasi
 window.addEventListener('DOMContentLoaded', () => {
   const city = document.getElementById('dash-weather-city').value.trim();
   if (city) fetchDashWeather();
