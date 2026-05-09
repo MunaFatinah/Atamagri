@@ -45,7 +45,6 @@ Route::prefix('v1')->group(function () {
 
 Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
 
-    // GET /api/v1/user — info user yang sedang login
     Route::get('/user', function (\Illuminate\Http\Request $request) {
         return response()->json([
             'success' => true,
