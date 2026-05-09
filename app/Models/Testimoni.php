@@ -8,7 +8,12 @@ class Testimoni extends Model
 {
     protected $table = 'testimonials';
 
-    protected $fillable = ['nama', 'peran', 'pesan', 'bintang'];
+    protected $fillable = ['user_id', 'nama', 'peran', 'pesan', 'bintang'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function getInitialsAttribute(): string
     {
