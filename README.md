@@ -1,59 +1,117 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🌾 Atamagri — Platform Pertanian Cerdas 5.0
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Platform pertanian berbasis Laravel yang terintegrasi dengan **OpenWeatherMap API** dan **Google Gemini AI** untuk monitoring cuaca real-time dan rekomendasi tanam cerdas.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Cara Instalasi
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 1. Persyaratan
+- PHP >= 8.1
+- Composer
+- MySQL / MariaDB
+- Node.js (opsional, untuk asset)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 2. Clone & Install
 
-## Learning Laravel
+```bash
+# Extract folder ini, lalu masuk ke direktori
+cd atamagri
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+# Install dependencies
+composer install
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+# Salin file .env
+cp .env.example .env
 
-## Laravel Sponsors
+# Generate app key
+php artisan key:generate
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 3. Konfigurasi Database
 
-### Premium Partners
+Edit file `.env`:
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=atamagri        # buat database ini dulu di MySQL
+DB_USERNAME=root
+DB_PASSWORD=password_anda
+```
 
-## Contributing
+### 4. ⚠️ Konfigurasi API Keys (WAJIB untuk fitur lengkap)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Edit file `.env` dan isi API key:
 
-## Code of Conduct
+```env
+# OpenWeatherMap - daftar GRATIS di https://openweathermap.org/api
+OWM_API_KEY=masukkan_api_key_owm_anda
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# Google Gemini AI - daftar GRATIS di https://aistudio.google.com/
+GEMINI_API_KEY=masukkan_api_key_gemini_anda
+```
 
-## Security Vulnerabilities
+> **Tanpa API key:** Aplikasi tetap berjalan dengan data demo (cuaca simulasi & rekomendasi rule-based).
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 5. Migrasi & Seeding Database
 
-## License
+```bash
+php artisan migrate
+php artisan db:seed
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 6. Jalankan Server
+
+```bash
+php artisan serve
+```
+
+Buka browser: **http://localhost:8000**
+
+---
+
+## 🔑 Akun Login Demo
+
+| Role   | Email                  | Password    |
+|--------|------------------------|-------------|
+| Admin  | admin@atamagri.id      | admin123    |
+| Petani | budi@email.com         | petani123   |
+
+---
+
+## 📂 Struktur Fitur
+
+| Halaman             | URL                    | Keterangan                          |
+|---------------------|------------------------|-------------------------------------|
+| Landing Page        | `/`                    | Beranda dengan 2 feature card       |
+| Monitoring Cuaca    | `/cuaca`               | Cek cuaca via OWM API               |
+| Rekomendasi Tanam   | `/rekomendasi`         | AI rekomendasi via Gemini           |
+| Testimoni           | `/testimoni`           | Form & daftar testimoni             |
+| Login               | `/login`               | Autentikasi                         |
+| Register            | `/register`            | Pendaftaran petani                  |
+| Dashboard Petani    | `/dashboard`           | Cuaca + Rekomendasi (authenticated) |
+| Admin Dashboard     | `/admin`               | Kelola user & statistik             |
+
+---
+
+## 🌐 API yang Digunakan
+
+### OpenWeatherMap (OWM)
+- Endpoint: `https://api.openweathermap.org/data/2.5/weather`
+- Daftar gratis: https://openweathermap.org/api
+- Free tier: 1000 call/hari
+
+### Google Gemini AI
+- Endpoint: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`
+- Daftar gratis: https://aistudio.google.com/
+- Free tier: tersedia
+
+---
+
+## 📞 Kontak
+
+- 📍 Merten, Tohudan, Kec. Colomadu, Karanganyar, Jawa Tengah
+- 📞 082114728871
+- ✉️ atamagri@gmail.com
