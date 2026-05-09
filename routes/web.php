@@ -25,8 +25,7 @@ Route::get('/rekomendasi', [RekomendasiController::class, 'index'])->name('rekom
 Route::post('/api/rekomendasi', [RekomendasiController::class, 'fetch'])->name('api.rekomendasi');
 
 // Testimoni
-Route::get('/testimoni', [TestimoniController::class, 'index'])->name('testimoni');
-Route::post('/testimoni', [TestimoniController::class, 'store'])->name('testimoni.store');
+Route::post('/testimoni', [TestimoniController::class, 'store'])->name('testimoni.store')->middleware('auth');
 
 // ═══════════════════════════════════════
 // AUTH ROUTES
