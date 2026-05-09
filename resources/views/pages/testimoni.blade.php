@@ -27,7 +27,6 @@
   <div style="background:var(--green-pale);color:var(--green-mid);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.5rem;font-weight:500;">✅ {{ session('success') }}</div>
   @endif
 
-  <!-- Form -->
   <div class="card" style="margin-bottom:2rem;">
     <div class="card-header"><h3>✍️ Tulis Testimoni</h3></div>
     <div class="card-body">
@@ -64,7 +63,6 @@
     </div>
   </div>
 
-  <!-- List -->
   @forelse($testimonials as $t)
   <div class="testi-list-card">
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.9rem;">
