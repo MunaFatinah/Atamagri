@@ -127,7 +127,6 @@ async function fetchWeather() {
     document.getElementById('demo-notice').style.display = d.demo ? 'inline-block' : 'none';
     document.getElementById('weather-result').style.display = 'block';
 
-    // Fetch rekomendasi too
     fetchRekomInline(city, d);
 
   } catch (e) {
