@@ -45,4 +45,9 @@ class User extends Authenticatable
             ->map(fn ($n) => strtoupper(substr($n, 0, 1)))
             ->implode('');
     }
+
+    public function testimonials()
+    {
+        return $this->hasMany(Testimoni::class);
+    }
 }
