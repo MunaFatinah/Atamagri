@@ -11,18 +11,16 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Admin
         User::create([
             'name'     => 'Admin Atamagri',
             'email'    => 'admin@atamagri.id',
             'password' => Hash::make('admin123'),
             'role'     => 'admin',
             'status'   => 'aktif',
-            'phone'    => '082114728871',
-            'location' => 'Karanganyar, Jawa Tengah',
+            'phone'    => '081234567890',
+            'location' => 'Malang, Jawa Timur',
         ]);
 
-        // Demo petani
         $petani = [
             ['name' => 'Budi Santoso',   'email' => 'budi@email.com',    'location' => 'Surakarta'],
             ['name' => 'Siti Aminah',    'email' => 'siti@email.com',    'location' => 'Karanganyar'],
@@ -36,8 +34,9 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Endah Rahayu',   'email' => 'endah@email.com',   'location' => 'Sukoharjo'],
         ];
 
+        $createdPetani = [];
         foreach ($petani as $p) {
-            User::create(array_merge([
+            $createdPetani[] = User::create(array_merge([
                 'password' => Hash::make('petani123'),
                 'role'     => 'petani',
                 'status'   => 'aktif',
@@ -45,11 +44,28 @@ class DatabaseSeeder extends Seeder
             ], $p));
         }
 
-        // Demo testimoni
         $testimonials = [
-            ['nama' => 'Mbah Jinah',    'peran' => 'Petani Sukoharjo',  'pesan' => 'Adanya alat ini, petani sangat senang karena dapat memantau lahan secara otomatis dari rumah saja.',                                                       'bintang' => 5],
-            ['nama' => 'Pak Sabar',     'peran' => 'Perangkat Desa',    'pesan' => 'Ini menjadi solusi utama dalam permasalahan pertanian saat ini, terkhusus meninjau perubahan cuaca yang ekstrem.',                                        'bintang' => 5],
-            ['nama' => 'Pak Abdullah',  'peran' => 'Petani Karanganyar','pesan' => 'Sekarang pertanian sudah canggih ya, saatnya petani beregenerasi dan Atamagri pasti siap mewujudkannya.',                                                 'bintang' => 5],
+            [
+                'user_id' => $createdPetani[0]->id,
+                'nama'    => $createdPetani[0]->name,
+                'peran'   => 'Petani Sukoharjo',
+                'pesan'   => 'Adanya alat ini, petani sangat senang karena dapat memantau lahan secara otomatis dari rumah saja.',
+                'bintang' => 5,
+            ],
+            [
+                'user_id' => $createdPetani[1]->id,
+                'nama'    => $createdPetani[1]->name,
+                'peran'   => 'Perangkat Desa',
+                'pesan'   => 'Ini menjadi solusi utama dalam permasalahan pertanian saat ini, terkhusus meninjau perubahan cuaca yang ekstrem.',
+                'bintang' => 5,
+            ],
+            [
+                'user_id' => $createdPetani[2]->id,
+                'nama'    => $createdPetani[2]->name,
+                'peran'   => 'Petani Karanganyar',
+                'pesan'   => 'Sekarang pertanian sudah canggih ya, saatnya petani beregenerasi dan Atamagri pasti siap mewujudkannya.',
+                'bintang' => 5,
+            ],
         ];
 
         foreach ($testimonials as $t) {
