@@ -73,7 +73,7 @@ footer{background:var(--gray-900);padding:3rem 2rem 1.5rem;color:rgba(255,255,25
 @endsection
 
 @section('content')
-<!-- HERO -->
+
 <div style="background:var(--off-white);">
   <div class="hero">
     <div class="hero-content">
@@ -88,7 +88,7 @@ footer{background:var(--gray-900);padding:3rem 2rem 1.5rem;color:rgba(255,255,25
     <div class="hero-visual">
       <div class="hero-float"><strong>512+</strong> Petani Terdaftar</div>
       <div style="display:flex;flex-direction:column;gap:1rem;">
-        <!-- Feature 1 - Monitoring Cuaca -->
+       
         <div class="hero-card" style="display:flex;align-items:flex-start;gap:1rem;">
           <div class="hero-icon-bg">🌤️</div>
           <div>
@@ -96,7 +96,7 @@ footer{background:var(--gray-900);padding:3rem 2rem 1.5rem;color:rgba(255,255,25
             <div style="font-size:.83rem;color:var(--gray-500);line-height:1.6;">Pantau suhu, kelembapan, angin, dan tekanan udara di lokasi lahan Anda secara langsung setiap saat.</div>
           </div>
         </div>
-        <!-- Feature 2 - Rekomendasi Tanam -->
+     
         <div class="hero-card" style="display:flex;align-items:flex-start;gap:1rem;">
           <div class="hero-icon-bg">🌱</div>
           <div>
@@ -109,7 +109,6 @@ footer{background:var(--gray-900);padding:3rem 2rem 1.5rem;color:rgba(255,255,25
   </div>
 </div>
 
-<!-- PARTNERS -->
 <div class="partners">
   <div class="partners-label">DEVELOPING PARTNER</div>
   <div class="partners-strip">
@@ -118,7 +117,6 @@ footer{background:var(--gray-900);padding:3rem 2rem 1.5rem;color:rgba(255,255,25
   </div>
 </div>
 
-<!-- ABOUT -->
 <div id="about" style="background:var(--white);padding:90px 0;">
   <div class="section-wrap" style="padding-top:0;padding-bottom:0;">
     <div class="about-inner">
@@ -144,7 +142,6 @@ footer{background:var(--gray-900);padding:3rem 2rem 1.5rem;color:rgba(255,255,25
   </div>
 </div>
 
-<!-- ACHIEVEMENTS -->
 <div id="pencapaian" style="padding:90px 0;background:var(--off-white);">
   <div class="section-wrap" style="padding-top:0;padding-bottom:0;">
     <div style="text-align:center;margin-bottom:1rem;">
@@ -163,7 +160,6 @@ footer{background:var(--gray-900);padding:3rem 2rem 1.5rem;color:rgba(255,255,25
   </div>
 </div>
 
-<!-- TESTIMONIAL -->
 <div style="background:var(--green-dark);padding:90px 0;">
   <div class="section-wrap" style="padding-top:0;padding-bottom:0;">
     <div style="text-align:center;margin-bottom:1rem;">
@@ -187,7 +183,6 @@ footer{background:var(--gray-900);padding:3rem 2rem 1.5rem;color:rgba(255,255,25
   </div>
 </div>
 
-<!-- CTA -->
 <div class="cta-strip">
   <h2>Mulai Bertani Lebih Cerdas</h2>
   <p>Daftarkan diri Anda dan dapatkan akses ke monitoring cuaca dan rekomendasi tanam berbasis AI.</p>
@@ -197,7 +192,6 @@ footer{background:var(--gray-900);padding:3rem 2rem 1.5rem;color:rgba(255,255,25
   </div>
 </div>
 
-<!-- FOOTER -->
 <footer>
   <div class="footer-inner">
     <div>
