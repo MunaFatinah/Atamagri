@@ -21,9 +21,6 @@ class RekomendasiController extends Controller
         return view('pages.rekomendasi');
     }
 
-    /**
-     * Public API endpoint
-     */
     public function fetch(Request $request)
     {
         $request->validate([
@@ -31,7 +28,6 @@ class RekomendasiController extends Controller
             'weather'  => 'nullable|array',
         ]);
 
-        // Get weather first if not provided
         $weather = $request->weather;
         if (!$weather) {
             $wc      = app(WeatherController::class);
@@ -41,7 +37,6 @@ class RekomendasiController extends Controller
             }
         }
 
-        // Get AI recommendation from Gemini
         $rekomendasi = $this->getGeminiRekomendasi($weather, $request->city);
 
         return response()->json([
@@ -51,17 +46,11 @@ class RekomendasiController extends Controller
         ]);
     }
 
-    /**
-     * Dashboard AJAX endpoint
-     */
     public function fetchDash(Request $request)
     {
         return $this->fetch($request);
     }
 
-    /**
-     * Get recommendations from Google Gemini API
-     */
     private function getGeminiRekomendasi(array $weather, string $city): array
     {
         if (empty($this->geminiKey) || $this->geminiKey === 'YOUR_GEMINI_API_KEY_HERE') {
@@ -97,7 +86,6 @@ class RekomendasiController extends Controller
             $text = $body['candidates'][0]['content']['parts'][0]['text'] ?? '';
             $text = trim($text);
 
-            // Strip markdown code fences if present
             $text = preg_replace('/^```json\s*/m', '', $text);
             $text = preg_replace('/```$/m', '', $text);
             $text = trim($text);
@@ -117,9 +105,6 @@ class RekomendasiController extends Controller
         }
     }
 
-    /**
-     * Build Gemini prompt from weather data
-     */
     private function buildPrompt(array $weather, string $city): string
     {
         $temp     = $weather['temp'] ?? 28;
@@ -129,7 +114,7 @@ class RekomendasiController extends Controller
         $condKey  = $weather['cond_key'] ?? 'clouds';
 
         return <<<PROMPT
-Kamu adalah ahli pertanian Indonesia. Berdasarkan data cuaca berikut, berikan rekomendasi 6 tanaman terbaik yang cocok ditanam sekarang.
+Berdasarkan data cuaca berikut, berikan rekomendasi 6 tanaman terbaik yang cocok ditanam sekarang.
 
 Data cuaca saat ini di {$city}:
 - Suhu: {$temp}°C
@@ -156,9 +141,6 @@ Pilih tanaman yang relevan untuk petani Indonesia (padi, jagung, cabai, tomat, b
 PROMPT;
     }
 
-    /**
-     * Fallback recommendation (rule-based) when no Gemini key
-     */
     private function getFallbackRekomendasi(array $weather): array
     {
         $temp = $weather['temp'] ?? 28;
@@ -216,7 +198,6 @@ PROMPT;
              'range_temp' => [22, 32], 'range_hum' => [55, 80]],
         ];
 
-        // Score each crop
         foreach ($crops as &$crop) {
             $score = 100;
             [$tMin, $tMax] = $crop['range_temp'];
