@@ -22,7 +22,7 @@ Route::post('/api/rekomendasi', [RekomendasiController::class, 'fetch'])->name('
 
 
 Route::post('/testimoni', [TestimoniController::class, 'store'])->name('testimoni.store')->middleware('auth');
-
+Route::get('/testimoni', [TestimoniController::class, 'index'])->name('testimoni');
 
 Route::get('/login', [AuthController::class, 'loginForm'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
