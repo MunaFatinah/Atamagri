@@ -3,14 +3,13 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WeatherController;
 use App\Http\Controllers\RekomendasiController;
+use App\Http\Controllers\ChatController;
 
 
 Route::prefix('v1')->group(function () {
 
-  
     Route::post('/cuaca', [WeatherController::class, 'fetch'])->name('api.v1.cuaca');
 
- 
     Route::get('/cuaca', function (\Illuminate\Http\Request $request) {
         $request->validate(['city' => 'required|string|max:100']);
         $wc = app(WeatherController::class);
@@ -21,9 +20,9 @@ Route::prefix('v1')->group(function () {
         return response()->json(['success' => true, 'data' => $data]);
     })->name('api.v1.cuaca.get');
 
-
     Route::post('/rekomendasi', [RekomendasiController::class, 'fetch'])->name('api.v1.rekomendasi');
 
+    Route::post('/chat', [ChatController::class, 'chat'])->name('api.chat');
 
     Route::get('/ping', function () {
         return response()->json([
@@ -42,7 +41,6 @@ Route::prefix('v1')->group(function () {
 });
 
 
-
 Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
 
     Route::get('/user', function (\Illuminate\Http\Request $request) {
@@ -58,9 +56,7 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
         ]);
     })->name('api.v1.user');
 
-   
     Route::post('/dashboard/cuaca', [WeatherController::class, 'fetchDash'])->name('api.v1.dashboard.cuaca');
-
     Route::post('/dashboard/rekomendasi', [RekomendasiController::class, 'fetchDash'])->name('api.v1.dashboard.rekomendasi');
 
 });

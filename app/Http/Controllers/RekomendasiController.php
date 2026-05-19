@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 class RekomendasiController extends Controller
 {
     private string $geminiKey;
-    private string $geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+    private string $geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
     public function __construct()
     {
@@ -39,6 +39,13 @@ class RekomendasiController extends Controller
 
         $rekomendasi = $this->getGeminiRekomendasi($weather, $request->city);
 
+        if (empty($rekomendasi)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mendapatkan rekomendasi dari Gemini AI. Coba beberapa saat lagi.',
+            ], 503);
+        }
+
         return response()->json([
             'success'     => true,
             'weather'     => $weather,
@@ -54,13 +61,17 @@ class RekomendasiController extends Controller
     private function getGeminiRekomendasi(array $weather, string $city): array
     {
         if (empty($this->geminiKey) || $this->geminiKey === 'YOUR_GEMINI_API_KEY_HERE') {
-            return $this->getFallbackRekomendasi($weather);
+            return [];
         }
 
         $prompt = $this->buildPrompt($weather, $city);
 
         try {
-            $response = Http::timeout(20)
+            $response = Http::timeout(60)
+                ->withHeaders([
+                    'Content-Type' => 'application/json; charset=utf-8',
+                    'Accept'       => 'application/json',
+                ])
                 ->withQueryParameters(['key' => $this->geminiKey])
                 ->post($this->geminiUrl, [
                     'contents' => [
@@ -71,18 +82,18 @@ class RekomendasiController extends Controller
                         ]
                     ],
                     'generationConfig' => [
-                        'temperature'     => 0.4,
-                        'maxOutputTokens' => 2048,
+                        'temperature'      => 0.3,
+                        'maxOutputTokens'  => 8192,
                         'responseMimeType' => 'application/json',
                     ],
                 ]);
 
             if ($response->failed()) {
                 Log::warning('Gemini API failed: ' . $response->status() . ' - ' . $response->body());
-                return $this->getFallbackRekomendasi($weather);
+                return [];
             }
 
-            $body = $response->json();
+            $body = json_decode($response->body(), true, 512, JSON_UNESCAPED_UNICODE);
             $text = $body['candidates'][0]['content']['parts'][0]['text'] ?? '';
             $text = trim($text);
 
@@ -90,18 +101,18 @@ class RekomendasiController extends Controller
             $text = preg_replace('/```$/m', '', $text);
             $text = trim($text);
 
-            $parsed = json_decode($text, true);
+            $parsed = json_decode($text, true, 512, JSON_UNESCAPED_UNICODE);
 
             if (!$parsed || !isset($parsed['tanaman'])) {
                 Log::warning('Gemini response parse failed: ' . $text);
-                return $this->getFallbackRekomendasi($weather);
+                return [];
             }
 
             return $parsed['tanaman'];
 
         } catch (\Exception $e) {
             Log::error('Gemini error: ' . $e->getMessage());
-            return $this->getFallbackRekomendasi($weather);
+            return [];
         }
     }
 
@@ -114,103 +125,12 @@ class RekomendasiController extends Controller
         $condKey  = $weather['cond_key'] ?? 'clouds';
 
         return <<<PROMPT
-Berdasarkan data cuaca berikut, berikan rekomendasi 6 tanaman terbaik yang cocok ditanam sekarang.
+Rekomendasikan 6 tanaman untuk petani di {$city} berdasarkan cuaca: suhu {$temp}°C, kelembapan {$hum}%, angin {$wind} km/h, tekanan {$pressure} hPa, kondisi {$condKey}.
 
-Data cuaca saat ini di {$city}:
-- Suhu: {$temp}°C
-- Kelembapan: {$hum}%
-- Kecepatan angin: {$wind} km/h
-- Tekanan udara: {$pressure} hPa
-- Kondisi: {$condKey}
+Balas JSON saja, tanpa teks lain:
+{"tanaman":[{"nama":"...","emoji":"...","deskripsi":"maks 10 kata","tips":"maks 10 kata","tags":["...","..."],"skor":0}]}
 
-Balaskan HANYA dalam format JSON valid (tanpa backtick, tanpa markdown) seperti ini:
-{
-  "tanaman": [
-    {
-      "nama": "Padi",
-      "emoji": "🌾",
-      "deskripsi": "Kalimat singkat mengapa cocok dengan cuaca ini.",
-      "tips": "Tips praktis 1 kalimat.",
-      "tags": ["Pangan Utama", "Lahan Basah"],
-      "skor": 92
-    }
-  ]
-}
-
-Pilih tanaman yang relevan untuk petani Indonesia (padi, jagung, cabai, tomat, bayam, kangkung, kedelai, singkong, bawang merah, timun, dll). Urutkan dari skor tertinggi. Skor 0-100 berdasarkan kesesuaian cuaca.
+Tanaman: padi, jagung, cabai, tomat, bayam, kangkung, kedelai, singkong, bawang merah, timun. Skor 0-100.
 PROMPT;
-    }
-
-    private function getFallbackRekomendasi(array $weather): array
-    {
-        $temp = $weather['temp'] ?? 28;
-        $hum  = $weather['humidity'] ?? 75;
-
-        $crops = [
-            ['nama' => 'Padi',         'emoji' => '🌾', 'tags' => ['Pangan Utama', 'Lahan Basah'],
-             'deskripsi' => 'Cocok dengan kelembapan tinggi dan suhu hangat saat ini.',
-             'tips'      => 'Ideal pada suhu 22–32°C dan kelembapan >70%.',
-             'range_temp' => [22, 32], 'range_hum' => [70, 90]],
-
-            ['nama' => 'Jagung',       'emoji' => '🌽', 'tags' => ['Pangan', 'Pakan Ternak'],
-             'deskripsi' => 'Tumbuh optimal pada suhu hangat dengan kelembapan sedang.',
-             'tips'      => 'Cocok suhu 20–35°C. Tahan kekeringan sedang.',
-             'range_temp' => [20, 35], 'range_hum' => [50, 80]],
-
-            ['nama' => 'Kedelai',      'emoji' => '🫛', 'tags' => ['Legum', 'Protein Nabati'],
-             'deskripsi' => 'Legum yang memperbaiki kesuburan tanah.',
-             'tips'      => 'Membutuhkan suhu 20–30°C dan drainase baik.',
-             'range_temp' => [20, 30], 'range_hum' => [55, 75]],
-
-            ['nama' => 'Kangkung',     'emoji' => '🥬', 'tags' => ['Sayuran', 'Panen Cepat'],
-             'deskripsi' => 'Sayuran hijau yang tumbuh cepat di kondisi lembap.',
-             'tips'      => 'Sangat adaptif. Cocok di lahan basah.',
-             'range_temp' => [20, 35], 'range_hum' => [60, 90]],
-
-            ['nama' => 'Cabai',        'emoji' => '🌶️', 'tags' => ['Hortikultura', 'Nilai Tinggi'],
-             'deskripsi' => 'Komoditas bernilai tinggi. Cocok saat cuaca cerah.',
-             'tips'      => 'Butuh sinar penuh. Hindari hujan berlebihan.',
-             'range_temp' => [22, 32], 'range_hum' => [50, 70]],
-
-            ['nama' => 'Tomat',        'emoji' => '🍅', 'tags' => ['Hortikultura', 'Sayuran Buah'],
-             'deskripsi' => 'Sayuran buah yang disukai pasar lokal.',
-             'tips'      => 'Optimal 15–30°C. Perlu trellis dan drainase baik.',
-             'range_temp' => [15, 30], 'range_hum' => [50, 70]],
-
-            ['nama' => 'Singkong',     'emoji' => '🍠', 'tags' => ['Pangan', 'Tahan Kering'],
-             'deskripsi' => 'Tanaman pangan tahan kering yang produktif.',
-             'tips'      => 'Bisa tumbuh di lahan kurang subur.',
-             'range_temp' => [20, 35], 'range_hum' => [40, 80]],
-
-            ['nama' => 'Bayam',        'emoji' => '🥗', 'tags' => ['Sayuran', 'Panen Cepat'],
-             'deskripsi' => 'Sayuran gizi tinggi, siklus panen singkat.',
-             'tips'      => 'Panen dalam 3–4 minggu pada suhu 18–30°C.',
-             'range_temp' => [18, 30], 'range_hum' => [50, 80]],
-
-            ['nama' => 'Bawang Merah', 'emoji' => '🧅', 'tags' => ['Bumbu', 'Nilai Tinggi'],
-             'deskripsi' => 'Komoditas bumbu dapur bernilai ekonomi tinggi.',
-             'tips'      => 'Butuh musim kering dengan kelembapan 50–70%.',
-             'range_temp' => [25, 32], 'range_hum' => [50, 70]],
-
-            ['nama' => 'Timun',        'emoji' => '🥒', 'tags' => ['Sayuran', 'Panen Cepat'],
-             'deskripsi' => 'Menyukai cuaca hangat dan lembap sedang.',
-             'tips'      => 'Panen 35–40 hari setelah tanam.',
-             'range_temp' => [22, 32], 'range_hum' => [55, 80]],
-        ];
-
-        foreach ($crops as &$crop) {
-            $score = 100;
-            [$tMin, $tMax] = $crop['range_temp'];
-            [$hMin, $hMax] = $crop['range_hum'];
-            if ($temp < $tMin) $score -= ($tMin - $temp) * 4;
-            elseif ($temp > $tMax) $score -= ($temp - $tMax) * 4;
-            if ($hum < $hMin) $score -= ($hMin - $hum) * 1.5;
-            elseif ($hum > $hMax) $score -= ($hum - $hMax) * 1.5;
-            $crop['skor'] = max(0, min(100, (int) round($score)));
-        }
-
-        usort($crops, fn ($a, $b) => $b['skor'] - $a['skor']);
-
-        return array_slice($crops, 0, 6);
     }
 }

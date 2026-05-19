@@ -35,7 +35,7 @@ class AuthController extends Controller
             if ($user->role === 'admin') {
                 return redirect()->route('admin.index');
             }
-            return redirect()->route('dashboard.index');
+            return redirect()->route('landing');
         }
 
         return back()->withErrors([
@@ -76,7 +76,7 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('dashboard.index')->with('success', 'Selamat datang di Atamagri, ' . $user->name . '!');
+        return redirect()->route('landing')->with('success', 'Selamat datang di Atamagri, ' . $user->name . '!');
     }
 
     public function logout(Request $request)

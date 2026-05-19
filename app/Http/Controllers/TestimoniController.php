@@ -23,6 +23,7 @@ class TestimoniController extends Controller
         ]);
 
         Testimoni::create([
+            'user_id' => auth()->id(),
             'nama'    => $request->nama,
             'peran'   => $request->peran ?? 'Pengguna Atamagri',
             'pesan'   => $request->pesan,

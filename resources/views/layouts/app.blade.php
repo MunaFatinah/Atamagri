@@ -60,10 +60,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;background:rgba(255,255,255,
 @unless(isset($hideNav) && $hideNav)
 <nav>
   <a class="nav-logo" href="{{ route('landing') }}">
-    <div class="nav-logo-mark">
-      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14v-4H7l5-8v4h4l-5 8z"/></svg>
-    </div>
-    <span class="nav-logo-text">Atamagri</span>
+    <img src="{{ asset('images/Logo Atamagri.svg') }}" alt="Atamagri" style="height:30px;">
   </a>
   <div class="nav-links">
     <a href="{{ route('landing') }}#about" class="{{ request()->is('/') ? 'active' : '' }}">Tentang</a>
@@ -76,8 +73,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;background:rgba(255,255,255,
     @auth
       @if(auth()->user()->role === 'admin')
         <a href="{{ route('admin.index') }}" class="btn btn-primary btn-sm">Dashboard Admin</a>
-      @else
-        <a href="{{ route('dashboard.index') }}" class="btn btn-primary btn-sm">Dashboard</a>
       @endif
       <form method="POST" action="{{ route('logout') }}" style="display:inline;">
         @csrf
@@ -107,7 +102,6 @@ function showToast(msg, icon='✅') {
   setTimeout(() => t.classList.remove('show'), 3500);
 }
 
-// Auto-show flash messages
 @if(session('success'))
 document.addEventListener('DOMContentLoaded', () => showToast('{{ session('success') }}'));
 @endif

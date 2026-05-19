@@ -14,6 +14,8 @@ body{background:var(--off-white);}
 .auth-form-box{width:100%;max-width:400px;}
 .auth-form-box h3{font-family:var(--font-display);font-size:1.8rem;font-weight:700;color:var(--green-dark);margin-bottom:.4rem;}
 .auth-form-box .sub{color:var(--gray-500);font-size:.9rem;margin-bottom:2rem;}
+.auth-back{display:inline-flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--gray-500);text-decoration:none;margin-bottom:1.75rem;transition:color .2s;}
+.auth-back:hover{color:var(--green-mid);}
 .form-group{margin-bottom:1.25rem;}
 .form-group label{display:block;font-size:.85rem;font-weight:500;color:var(--gray-700);margin-bottom:.5rem;}
 .form-group input{width:100%;padding:.7rem 1rem;border-radius:var(--radius);border:1.5px solid var(--gray-200);font-family:var(--font-body);font-size:.9rem;color:var(--gray-900);outline:none;transition:border-color .2s;}
@@ -22,22 +24,31 @@ body{background:var(--off-white);}
 .auth-switch a{color:var(--green-mid);font-weight:600;text-decoration:none;}
 .auth-switch a:hover{text-decoration:underline;}
 .error-msg{background:#ffebee;color:#c62828;border-radius:8px;padding:.75rem 1rem;font-size:.85rem;margin-bottom:1rem;}
+.lupa-pass{font-size:.85rem;color:var(--green-mid);cursor:pointer;text-decoration:none;}
+.lupa-pass:hover{text-decoration:underline;}
 @media(max-width:900px){.auth-visual{display:none;}.auth-page{grid-template-columns:1fr;}}
 @endsection
 
 @section('content')
 <div class="auth-page">
+
+  {{-- Kiri: Visual --}}
   <div class="auth-visual">
     <div class="auth-visual-content">
-      <div class="auth-visual-icon">🌾</div>
+      <div class="auth-visual-icon">🌱</div>
       <h2>Selamat Datang<br>di Atamagri</h2>
-      <p>Platform pertanian cerdas berbasis IoT untuk petani Indonesia yang lebih modern dan berdaya saing.</p>
+      <p>Solusi pertanian modern berbasis teknologi digital untuk petani Indonesia</p>
     </div>
   </div>
+
+  {{-- Kanan: Form --}}
   <div class="auth-form-side">
     <div class="auth-form-box">
+
+      <a href="{{ route('landing') }}" class="auth-back">← Kembali ke Beranda</a>
+
       <h3>Masuk ke Akun</h3>
-      <p class="sub">Gunakan email dan password yang terdaftar.</p>
+      <p class="sub">Gunakan akun petani atau admin Anda</p>
 
       @if($errors->any())
       <div class="error-msg">{{ $errors->first() }}</div>
@@ -47,16 +58,14 @@ body{background:var(--off-white);}
         @csrf
         <div class="form-group">
           <label>Email</label>
-          <input type="email" name="email" value="{{ old('email') }}" placeholder="petani@email.com" required/>
+          <input type="email" name="email" value="{{ old('email') }}" placeholder="email@example.com" required/>
         </div>
         <div class="form-group">
           <label>Password</label>
           <input type="password" name="password" placeholder="Masukkan password" required/>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
-          <label style="display:flex;align-items:center;gap:.4rem;font-size:.85rem;cursor:pointer;">
-            <input type="checkbox" name="remember"> Ingat saya
-          </label>
+        <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:1.5rem;">
+          <a href="#" class="lupa-pass">Lupa password?</a>
         </div>
         <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:.8rem;">Masuk</button>
       </form>
@@ -64,16 +73,9 @@ body{background:var(--off-white);}
       <div class="auth-switch">
         Belum punya akun? <a href="{{ route('register') }}">Daftar sekarang</a>
       </div>
-      <div class="auth-switch" style="margin-top:.5rem;">
-        <a href="{{ route('landing') }}">← Kembali ke Beranda</a>
-      </div>
 
-      <div style="margin-top:2rem;padding:1rem;background:var(--green-mist);border-radius:10px;font-size:.8rem;color:var(--gray-500);">
-        <strong style="color:var(--green-dark);">Demo Login:</strong><br>
-        Admin: <code>admin@atamagri.id</code> / <code>admin123</code><br>
-        Petani: <code>budi@email.com</code> / <code>petani123</code>
-      </div>
     </div>
   </div>
+
 </div>
 @endsection

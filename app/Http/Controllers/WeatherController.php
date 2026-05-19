@@ -21,9 +21,6 @@ class WeatherController extends Controller
         return view('pages.cuaca');
     }
 
-    /**
-     * Fetch weather from OpenWeatherMap API
-     */
     public function fetch(Request $request)
     {
         $request->validate([
@@ -42,44 +39,43 @@ class WeatherController extends Controller
         ]);
     }
 
-    /**
-     * Fetch for dashboard (authenticated)
-     */
     public function fetchDash(Request $request)
     {
         return $this->fetch($request);
     }
 
     /**
-     * Core method: calls OWM API
+     * Core method — strict Indonesia-only validation
      */
     public function getWeather(string $city): array
     {
+        $cleaned = trim($city);
+
+        if (strlen($cleaned) < 2) {
+            return ['error' => 'Nama kota terlalu pendek. Masukkan nama kota yang valid.'];
+        }
+
+        // Tolak input tanpa vokal (kemungkinan besar typo/random)
+        if (!preg_match('/[aeiouAEIOU]/', $cleaned)) {
+            return ['error' => "'{$cleaned}' bukan nama kota yang valid. Coba nama seperti: Malang, Surabaya, Semarang."];
+        }
+
         if (empty($this->apiKey) || $this->apiKey === 'YOUR_OWM_API_KEY_HERE') {
-            // Return demo data if no API key configured
             return $this->getDemoWeather($city);
         }
 
         try {
+            // Selalu cari dengan filter Indonesia (,ID)
             $response = Http::timeout(10)->get("{$this->baseUrl}/weather", [
-                'q'     => $city . ',ID',
+                'q'     => $cleaned . ',ID',
                 'appid' => $this->apiKey,
                 'units' => 'metric',
                 'lang'  => 'id',
             ]);
 
-            if ($response->failed()) {
-                // Try without country code
-                $response = Http::timeout(10)->get("{$this->baseUrl}/weather", [
-                    'q'     => $city,
-                    'appid' => $this->apiKey,
-                    'units' => 'metric',
-                    'lang'  => 'id',
-                ]);
-            }
-
+            // Tidak ditemukan di Indonesia → langsung error, tidak fallback global
             if ($response->status() === 404) {
-                return ['error' => "Kota '{$city}' tidak ditemukan. Coba nama kota lain."];
+                return ['error' => "Kota '{$cleaned}' tidak ditemukan di Indonesia. Coba nama kota lain seperti: Malang, Klaten, Purwokerto."];
             }
 
             if ($response->status() === 401) {
@@ -87,35 +83,38 @@ class WeatherController extends Controller
             }
 
             if ($response->failed()) {
-                return ['error' => 'Gagal mengambil data cuaca. Coba lagi.'];
+                return ['error' => 'Gagal mengambil data cuaca. Coba lagi beberapa saat.'];
             }
 
             $raw = $response->json();
+
+            // Double-check: pastikan hasil dari OWM memang negara Indonesia
+            $country = $raw['sys']['country'] ?? '';
+            if ($country !== 'ID') {
+                return ['error' => "'{$cleaned}' tidak ditemukan sebagai kota di Indonesia. Pastikan nama kota benar."];
+            }
 
             return $this->formatWeather($raw);
 
         } catch (\Exception $e) {
             Log::error('OWM API Error: ' . $e->getMessage());
-            return ['error' => 'Koneksi gagal: ' . $e->getMessage()];
+            return ['error' => 'Koneksi gagal. Periksa koneksi internet Anda.'];
         }
     }
 
-    /**
-     * Format OWM response to app format
-     */
     private function formatWeather(array $raw): array
     {
         $condId  = $raw['weather'][0]['id'] ?? 800;
         $condKey = $this->getConditionKey($condId);
 
         return [
-            'name'       => $raw['name'],
+            'name' => $this->cleanCityName($raw['name']),
             'country'    => $raw['sys']['country'] ?? 'ID',
             'temp'       => round($raw['main']['temp']),
             'feels_like' => round($raw['main']['feels_like']),
             'humidity'   => $raw['main']['humidity'],
             'pressure'   => $raw['main']['pressure'],
-            'wind_speed' => round($raw['wind']['speed'] * 3.6), // m/s → km/h
+            'wind_speed' => round($raw['wind']['speed'] * 3.6),
             'wind_deg'   => $raw['wind']['deg'] ?? 0,
             'visibility' => isset($raw['visibility']) ? round($raw['visibility'] / 1000) : null,
             'clouds'     => $raw['clouds']['all'] ?? 0,
@@ -126,9 +125,6 @@ class WeatherController extends Controller
         ];
     }
 
-    /**
-     * Demo data when no API key
-     */
     private function getDemoWeather(string $city): array
     {
         $cityDb = [
@@ -137,6 +133,7 @@ class WeatherController extends Controller
             'surakarta' => ['temp' => 28, 'humidity' => 74, 'wind' => 10, 'pressure' => 1012, 'id' => 800],
             'yogya'     => ['temp' => 27, 'humidity' => 76, 'wind' => 8,  'pressure' => 1011, 'id' => 801],
             'semarang'  => ['temp' => 30, 'humidity' => 80, 'wind' => 12, 'pressure' => 1009, 'id' => 500],
+            'malang'    => ['temp' => 24, 'humidity' => 80, 'wind' => 9,  'pressure' => 1013, 'id' => 801],
             'default'   => ['temp' => 29, 'humidity' => 75, 'wind' => 10, 'pressure' => 1011, 'id' => 801],
         ];
 
@@ -191,5 +188,11 @@ class WeatherController extends Controller
         if ($id === 800)             return '☀️';
         if ($id === 801 || $id === 802) return '⛅';
         return '☁️';
+    }
+
+    private function cleanCityName(string $name): string
+    {
+        $name = preg_replace('/^(Kabupaten|Kota|Regency|City|Distrik|Daerah)\s+/i', '', $name);
+        return trim($name);
     }
 }

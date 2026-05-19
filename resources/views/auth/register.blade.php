@@ -31,7 +31,7 @@
     <div class="auth-visual-content">
       <div class="auth-visual-icon">🌱</div>
       <h2>Bergabung dengan<br>Atamagri</h2>
-      <p>Daftarkan diri Anda dan nikmati fitur monitoring cuaca real-time serta rekomendasi tanam berbasis AI gratis.</p>
+      <p>Platform pertanian modern untuk membantu petani Indonesia lebih maju dengan teknologi digital.</p>
     </div>
   </div>
   <div class="auth-form-side">
