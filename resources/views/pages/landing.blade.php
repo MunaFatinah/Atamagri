@@ -121,8 +121,8 @@ footer{background:var(--gray-900);padding:3rem 2rem 1.5rem;color:rgba(255,255,25
   <div class="section-wrap" style="padding-top:0;padding-bottom:0;">
     <div class="about-inner">
       <div style="position:relative;">
-        <div class="about-img-bg">
-          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14v-4H7l5-8v4h4l-5 8z"/></svg>
+        <div style="background:linear-gradient(135deg,#5CB85C 0%,#325E32 100%); border-radius:32px; display:flex; align-items:center; justify-content:center; padding:3rem; aspect-ratio:4/3;">
+            <img src="{{ asset('images/Vector Dashboard.svg') }}" alt="Atamagri Dashboard" style="width:100%; max-width:260px;">
         </div>
         <div class="about-badge"><div class="num">6+</div><p>Penghargaan<br>Nasional</p></div>
       </div>
